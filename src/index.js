@@ -8,7 +8,7 @@ const cors = require('cors');
 require('dotenv').config();
 
 
-const limiter = rateLimit({
+const rateLimiter = rateLimit({
     windowMs: 30 * 1000, // 30 sec
     max: 5, // limit each IP to 5 requests per windowMs
 });
@@ -24,7 +24,7 @@ app.use(helmet());
 app.use(morgan('dev'));
 app.use(cors());
 app.use(express.json());
-app.use(limiter);
+app.use(rateLimiter);
 app.use(speedLimiter);
 
 
@@ -35,7 +35,7 @@ app.get('/', (req, res) => {
     })
 })
 
-app.post('/send', slowDown, rateLimit, (req, res) => {
+app.post('/send', (req, res) => {
     console.log(req.body);
     const { name, email, subject, message } = req.body;
     const transporter = nodemailer.createTransport({
