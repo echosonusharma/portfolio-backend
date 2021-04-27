@@ -10,13 +10,13 @@ require('dotenv').config();
 
 const limiter = rateLimit({
     windowMs: 30 * 1000, // 30 sec
-    max: 10, // limit each IP to 10 requests per windowMs
+    max: 5, // limit each IP to 5 requests per windowMs
 });
 
 const speedLimiter = slowDown({
     windowMs: 30 * 1000,
-    delayAfter: 5,
-    delayMs: 1000, // begin adding 1000ms of delay per request above 5 api calls per windowMs
+    delayAfter: 3,
+    delayMs: 1000, // begin adding 1000ms of delay per request above 3 api calls per windowMs
 });
 
 const app = express();
@@ -35,7 +35,7 @@ app.get('/', (req, res) => {
     })
 })
 
-app.post('/send', (req, res) => {
+app.post('/send', slowDown, rateLimit, (req, res) => {
     console.log(req.body);
     const { name, email, subject, message } = req.body;
     const transporter = nodemailer.createTransport({
